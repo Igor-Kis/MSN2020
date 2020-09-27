@@ -70,7 +70,6 @@ namespace WindowsFormsMSN2020
                                                         {0.010, 0.009, 0.009, 0.009, 0.009},
                                                         {0.003, 0.003, 0.003, 0.003, 0.003},
                                                         {0.001, 0.001, 0.001, 0.001, 0.001}};
-
         public void HIinterpolation()
         {
             double Sum1=0;

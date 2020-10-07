@@ -9,28 +9,23 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Xml;
-using System.Globalization;
 
 namespace WindowsFormsMSN2020
 {
     public partial class Form1 : Form
     {
+        MSNCalculation MSNCalc;
         public Dictionary<string, IsotopeProperties> Isotopes;
-        public Compute Compute = new Compute();
-        
         public Form1()
         {
-            
             InitializeComponent();
             Isotopes = new Dictionary<string, IsotopeProperties>();
-            
             LoadData();
             if (Isotopes.Count > 0)
             {
                 FillGrid();
             }
-            
-            
+
         }
 
         private void FillGrid()
@@ -43,7 +38,7 @@ namespace WindowsFormsMSN2020
                 pos++;
             }
         }
-        
+
         private void LoadData()
         {
             Isotopes.Clear();
@@ -64,7 +59,7 @@ namespace WindowsFormsMSN2020
                                 ip.LoadFromXml(child);
                                 Isotopes.Add(ip.Name, ip);
                                 LastSuccess = ip.Name;
-                                                            }
+                            }
                 }
                 catch (Exception e)
                 {
@@ -73,56 +68,22 @@ namespace WindowsFormsMSN2020
             }
             else System.Windows.Forms.MessageBox.Show("LoadData. Файл не найден (" + _filename + ")! ");
         }
-        private void Form1_Load(object sender, EventArgs e)
-        {
-        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            (double AZ, double R) NucDens;
-            for (int i = 0; i< dataGridView1.RowCount; i++)
-            {
-                NucDens = (0.0, 0.0);
-                double value = -1;
-                if (dataGridView1[1, i].Value != null)
-                {
-                    if (double.TryParse(dataGridView1[1, i].Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
-                    {
-                        NucDens.AZ = value * Math.Pow(10, 20);
-                        ///double.Parse(dataGridView1[1, i].Value.ToString())
-                    }
-                    else
-                    {
-                        System.Windows.Forms.MessageBox.Show("Недопустимые символы в ячейке ввода");
-                    }
-                }
-                if (dataGridView1[2, i].Value != null)
-                {
-                    if (double.TryParse(dataGridView1[2, i].Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
-                    {
-                        NucDens.R = value * Math.Pow(10, 20);
-                    }
-                    else
-                    {
-                        System.Windows.Forms.MessageBox.Show("Недопустимые символы в ячейке ввода");
-                    }
-                    ///Compute.NucDens.R = double.Parse(dataGridView1[2, i].Value.ToString()) * Math.Pow(10, 20); 
-                }
-                Compute.NucDensity.Add(NucDens);
-            }
-            Compute.LoadIsotopesData(ref Compute.MacroSection, Compute.NucDensity);
-            Compute.HIinterpolation();
-            Compute.Potok(0);
-            Compute.OneGroupConst(0);
-            Compute.Radius();
-            for (int i = 0; i < 15; i++)
-            {
-                System.Windows.Forms.MessageBox.Show(Compute.HI[i].ToString());
-                ///System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
-            }
-        }
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
+            double T = 293;
+            bool isSelfScreening = false;
+            bool isInfinityReflector = true;
+            double ReflectorTicknessRatio = 0.3;
+            double HeatOutput = 100;
+            MSNCalc = new MSNCalculation(T, isSelfScreening, isInfinityReflector, ReflectorTicknessRatio, HeatOutput);
+            MacroIsotopePropertiesList ac = new MacroIsotopePropertiesList();
+            ac.Add(new MacroIsotopeProperties(Isotopes["U235"], 1.2e+21, MSNCalc));
+            ac.Add(new MacroIsotopeProperties(Isotopes["U238"], 1.2e+22, MSNCalc));
+            ac.Add(new MacroIsotopeProperties(Isotopes["C"], 3.2e+23, MSNCalc));
+            MacroIsotopePropertiesList r = new MacroIsotopePropertiesList();
+            ac.Add(new MacroIsotopeProperties(Isotopes["C"], 3.3e+23, MSNCalc));
+            MSNCalc.Init(ac, r);
         }
     }
 }

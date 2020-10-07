@@ -34,9 +34,9 @@ namespace WindowsFormsMSN2020
     public class Compute
     {
         public double[,,] MacroSection = new double[2, 26, 12];
-        public List<double[,,]> IsotopesData = new List<double[,,]>();
+        ///public List<double[,,]> IsotopesData = new List<double[,,]>();
         public List<(double AZ, double R)> NucDensity = new List<(double, double)>();
-        public (double AZ, double R) NucDens;
+       
         public double[,] DJ = new double[2, 26];
         public double[] HI = new double[26] { 0.016, 0.088, 0.184, 0.27, 0.202, 0.141, 0.061, 0.024, 0.01, 0.003, 0.001, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
         public List<double[,]> InElasticMatrixes = new List<double[,]>();

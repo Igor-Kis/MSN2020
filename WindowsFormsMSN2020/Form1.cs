@@ -43,7 +43,9 @@ namespace WindowsFormsMSN2020
                 pos++;
             }
         }
-        
+        /// <summary>
+        /// dds
+        /// </summary>
         private void LoadData()
         {
             Isotopes.Clear();

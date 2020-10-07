@@ -43,9 +43,7 @@ namespace WindowsFormsMSN2020
                 pos++;
             }
         }
-        /// <summary>
-        /// dds
-        /// </summary>
+        
         private void LoadData()
         {
             Isotopes.Clear();
@@ -111,6 +109,7 @@ namespace WindowsFormsMSN2020
                 }
                 Compute.NucDensity.Add(NucDens);
             }
+            Compute.Isotopes = Isotopes;
             Compute.LoadIsotopesData(ref Compute.MacroSection, Compute.NucDensity);
             Compute.HIinterpolation();
             Compute.Potok(0);
@@ -118,8 +117,9 @@ namespace WindowsFormsMSN2020
             Compute.Radius();
             for (int i = 0; i < 15; i++)
             {
-                System.Windows.Forms.MessageBox.Show(Compute.HI[i].ToString());
-                ///System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
+                ///System.Windows.Forms.MessageBox.Show(Compute.HI[i].ToString());
+                System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
+                ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.S_t].ToString());
             }
         }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)

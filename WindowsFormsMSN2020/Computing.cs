@@ -134,7 +134,6 @@ namespace WindowsFormsMSN2020
                     MacroSection[(int)Zones.AZ, Group, (int)Consts.MU] += isotope.Value.SigmaElasticScattering[Group] * isotope.Value.MuElasticScattering[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
                     MacroSection[(int)Zones.AZ, Group, (int)Consts.KSI] += isotope.Value.SigmaElasticScattering[Group] * isotope.Value.KsiElasticScattering[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
 
-                    ///* ip.SigmaFission[Group] * NucDensity[IsotopeNum].AZ
                     for (int Column = 0; Column < 26; Column++)
                     {
                         MatrixSigmaScatteringAZ[Group, Column] += isotope.Value.MatrixInelasticScattering[Group, Column] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);

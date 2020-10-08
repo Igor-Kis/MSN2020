@@ -41,13 +41,10 @@ namespace WindowsFormsMSN2020
         public double[,] DJ = new double[2, 26];
         public double[] HI = new double[26] { 0.016, 0.088, 0.184, 0.27, 0.202, 0.141, 0.061, 0.024, 0.01, 0.003, 0.001, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
         public List<double[,]> InElasticMatrixes = new List<double[,]>();
-        public double[,] MatrixSigmaScatteringAZ = new double[26, 26];
+        public double[,,] MatrixSigmaScattering = new double[2,26, 26];
         public List<double[]> SigmaU= new List<double[]>();
         public double[] sigmaU = new double[26];
-        public double su;
-        public double a1;
-        public double a2;
-        public double a3;
+        
         public double[,] FJ = new double[2, 26];
         public double[,] FJZ = new double[2, 26];
         
@@ -119,56 +116,73 @@ namespace WindowsFormsMSN2020
         {            
             int pos = 0;
             int IsotopeNum = 0;
-            foreach (var isotope in Isotopes)
+            double su1;
+            double NuclearDensity;
+
+            for (int Zone = 0; Zone < 2; Zone++)
             {
+                IsotopeNum = 0;
+                foreach (var isotope in Isotopes)
+                {
+
+                    for (int Group = 0; Group < 26; Group++)
+                    {
+                        su1 = 0;
+                        if (Zone==0)
+                        { NuclearDensity = NucDensity[IsotopeNum].AZ; }
+                        else
+                        { NuclearDensity = NucDensity[IsotopeNum].R; }
+                        MacroSection[Zone, Group, (int)Consts.S_t] += isotope.Value.SigmaTotal[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.S_f] += isotope.Value.SigmaFission[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.NU] += isotope.Value.SigmaFission[Group] * isotope.Value.NuFission[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.S_c] += isotope.Value.SigmaCapture[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.S_e] += isotope.Value.SigmaElasticScattering[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.S_in] += isotope.Value.SigmaInelasticScattering[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.S_z] += isotope.Value.SigmaElasticZam[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.MU] += isotope.Value.SigmaElasticScattering[Group] * isotope.Value.MuElasticScattering[Group] * NuclearDensity * Math.Pow(10, -24);
+                        MacroSection[Zone, Group, (int)Consts.KSI] += isotope.Value.SigmaElasticScattering[Group] * isotope.Value.KsiElasticScattering[Group] * NuclearDensity * Math.Pow(10, -24);
+
+                        for (int Column = 0; Column < 26; Column++)
+                        {
+                            MatrixSigmaScattering[Zone, Group, Column] += isotope.Value.MatrixInelasticScattering[Group, Column] * NuclearDensity * Math.Pow(10, -24);
+                            if (Column > Group)
+                            {
+                                su1 += isotope.Value.MatrixInelasticScattering[Group, Column];
+                            }
+                        }
+                        MacroSection[Zone, Group, (int)Consts.S_u] += (isotope.Value.SigmaFission[Group] + isotope.Value.SigmaCapture[Group] + isotope.Value.SigmaElasticZam[Group] + su1) * NuclearDensity * Math.Pow(10, -24);
+                    }
+                    InElasticMatrixes.Add(isotope.Value.MatrixInelasticScattering);
+                    IsotopeNum++;
+                };
                 for (int Group = 0; Group < 26; Group++)
                 {
-                    su = 0;
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_t] += isotope.Value.SigmaTotal[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_f] += isotope.Value.SigmaFission[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.NU] += isotope.Value.SigmaFission[Group] * isotope.Value.NuFission[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_c] += isotope.Value.SigmaCapture[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_e] += isotope.Value.SigmaElasticScattering[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_in] += isotope.Value.SigmaInelasticScattering[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_z] += isotope.Value.SigmaElasticZam[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.MU] += isotope.Value.SigmaElasticScattering[Group] * isotope.Value.MuElasticScattering[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.KSI] += isotope.Value.SigmaElasticScattering[Group] * isotope.Value.KsiElasticScattering[Group] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-
-                    for (int Column = 0; Column < 26; Column++)
+                    MacroSection[Zone, Group, (int)Consts.MU] = MacroSection[Zone, Group, (int)Consts.MU] / MacroSection[Zone, Group, (int)Consts.S_e];
+                    MacroSection[Zone, Group, (int)Consts.KSI] = MacroSection[Zone, Group, (int)Consts.KSI] / MacroSection[Zone, Group, (int)Consts.S_e];
+                    if (MacroSection[Zone, Group, (int)Consts.S_f] > 0)
                     {
-                        MatrixSigmaScatteringAZ[Group, Column] += isotope.Value.MatrixInelasticScattering[Group, Column] * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
-                        if (Column > Group)
-                        { su += isotope.Value.MatrixInelasticScattering[Group, Column]; }
-
+                        MacroSection[Zone, Group, (int)Consts.NU] = MacroSection[Zone, Group, (int)Consts.NU] / MacroSection[Zone, Group, (int)Consts.S_f];
+                        /// MacroSection[Zone, Group, (int)Consts.HI] = MacroSection[Zone, Group, (int)Consts.HI] / MacroSection[Zone, Group, (int)Consts.S_f];
                     }
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.S_u] += (isotope.Value.SigmaFission[Group] + isotope.Value.SigmaCapture[Group] + isotope.Value.SigmaElasticZam[Group] + su) * NucDensity[IsotopeNum].AZ * Math.Pow(10, -24);
+                    else
+                    {
+                        MacroSection[Zone, Group, (int)Consts.NU] = 0;
+                        ///MacroSection[Zone, Group, (int)Consts.HI] = 0;
+                    }
+                    DJ[Zone, Group] = 1 / (3 * (MacroSection[Zone, Group, (int)Consts.S_t] - MacroSection[Zone, Group, (int)Consts.MU] * MacroSection[Zone, Group, (int)Consts.S_e]));
+                    pos++;
                 }
-                InElasticMatrixes.Add(isotope.Value.MatrixInelasticScattering);
 
-                IsotopeNum++;
-            };
-            for (int Group = 0; Group < 26; Group++)
-            {
-                MacroSection[(int)Zones.AZ, Group, (int)Consts.MU] = MacroSection[(int)Zones.AZ, Group, (int)Consts.MU] / MacroSection[(int)Zones.AZ, Group, (int)Consts.S_e];
-                MacroSection[(int)Zones.AZ, Group, (int)Consts.KSI] = MacroSection[(int)Zones.AZ, Group, (int)Consts.KSI] / MacroSection[(int)Zones.AZ, Group, (int)Consts.S_e];
-                if (MacroSection[(int)Zones.AZ, Group, (int)Consts.S_f] > 0)
-                {
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.NU] = MacroSection[(int)Zones.AZ, Group, (int)Consts.NU] / MacroSection[(int)Zones.AZ, Group, (int)Consts.S_f];
-                    /// MacroSection[(int)Zones.AZ, Group, (int)Consts.HI] = MacroSection[(int)Zones.AZ, Group, (int)Consts.HI] / MacroSection[(int)Zones.AZ, Group, (int)Consts.S_f];
-                }
-                else
-                {
-                    MacroSection[(int)Zones.AZ, Group, (int)Consts.NU] = 0;
-                    ///MacroSection[(int)Zones.AZ, Group, (int)Consts.HI] = 0;
-                }
-                DJ[(int)Zones.AZ, Group] = 1 / (3 * (MacroSection[(int)Zones.AZ, Group, (int)Consts.S_t] - MacroSection[(int)Zones.AZ, Group, (int)Consts.MU] * MacroSection[(int)Zones.AZ, Group, (int)Consts.S_e]));
-                pos++;
             }
+
         }
 
         public void Potok(int zone)
         {///вычисление потоков
-            
+            double a1=0;
+            double a2=0;
+            double a3=0;
+            double su;
             for (int Column = 0; Column < 26; Column++)
             {
 
@@ -177,7 +191,7 @@ namespace WindowsFormsMSN2020
                 {
                     for (int Row = 0; Row < Column; Row++)
                     {
-                        su += FJ[zone, Row] * MatrixSigmaScatteringAZ[Row, Column]; 
+                        su += FJ[zone, Row] * MatrixSigmaScattering[(int)Zones.AZ, Row, Column]; 
                     }
                     su += FJ[zone, Column - 1] * MacroSection[zone, Column - 1, (int)Consts.S_z];
                 }
@@ -196,7 +210,7 @@ namespace WindowsFormsMSN2020
                 {
                     for (int Column = Row + 1; Column < 26; Column++)
                     {
-                        su += FJZ[zone, Column] * MatrixSigmaScatteringAZ[Row, Column];
+                        su += FJZ[zone, Column] * MatrixSigmaScattering[(int)Zones.AZ, Row, Column];
                     }
                     su += FJZ[zone, Row+1] * MacroSection[zone, Row+1, (int)Consts.S_z];
                 }
@@ -219,7 +233,7 @@ namespace WindowsFormsMSN2020
                 {
                     for (int j = 0; j < i; j++)
                     { 
-                        C+=FJ[zone,j]* MatrixSigmaScatteringAZ[j, i]; 
+                        C+=FJ[zone,j]* MatrixSigmaScattering[(int)Zones.AZ, j, i]; 
                     }
                     C += FJ[zone, i - 1] * MacroSection[zone, i - 1, (int)Consts.S_z];
                 }

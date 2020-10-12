@@ -117,7 +117,7 @@ namespace WindowsFormsMSN2020
             Compute.Radius();
             for (int i = 0; i < 15; i++)
             {
-                ///System.Windows.Forms.MessageBox.Show(Compute.HI[i].ToString());
+                ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.HI].ToString());
                 System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
                 ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.S_t].ToString());
             }

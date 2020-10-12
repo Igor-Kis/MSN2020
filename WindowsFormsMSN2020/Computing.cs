@@ -39,11 +39,11 @@ namespace WindowsFormsMSN2020
         public List<(double AZ, double R)> NucDensity = new List<(double, double)>();
        
         public double[,] DJ = new double[2, 26];
-        public double[] HI = new double[26] { 0.016, 0.088, 0.184, 0.27, 0.202, 0.141, 0.061, 0.024, 0.01, 0.003, 0.001, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+        ///public double[] HI = new double[26] { 0.016, 0.088, 0.184, 0.27, 0.202, 0.141, 0.061, 0.024, 0.01, 0.003, 0.001, 0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
         public List<double[,]> InElasticMatrixes = new List<double[,]>();
         public double[,,] MatrixSigmaScattering = new double[2,26, 26];
-        public List<double[]> SigmaU= new List<double[]>();
-        public double[] sigmaU = new double[26];
+        ///public List<double[]> SigmaU= new List<double[]>();
+        ///public double[] sigmaU = new double[26];
         
         public double[,] FJ = new double[2, 26];
         public double[,] FJZ = new double[2, 26];
@@ -56,7 +56,7 @@ namespace WindowsFormsMSN2020
         public double R0;
         public double R0F;
         public double NU;
-        public double[,] HIMatrix = new double[12, 5] { {2.4, 2.6, 2.8, 3.0, 3.2},
+        public double[,] HIMatrix = new double[11, 5] { 
                                                         {0.016, 0.017, 0.018, 0.020, 0.21 },
                                                         {0.088, 0.092, 0.095, 0.098, 0.101},
                                                         {0.184, 0.186, 0.188, 0.190, 0.192},
@@ -68,6 +68,7 @@ namespace WindowsFormsMSN2020
                                                         {0.010, 0.009, 0.009, 0.009, 0.009},
                                                         {0.003, 0.003, 0.003, 0.003, 0.003},
                                                         {0.001, 0.001, 0.001, 0.001, 0.001}};
+        public double[] NUArray = new double[5] { 2.4, 2.6, 2.8, 3.0, 3.2 };
         public void HIinterpolation()
         {
             double Sum1=0;
@@ -82,22 +83,22 @@ namespace WindowsFormsMSN2020
             }
             NU = Sum1 / Sum2;
 
-            if (NU < HIMatrix[0, 1]&NU> HIMatrix[0, 0])
+            if (NU < NUArray[1]&NU> NUArray[0])
             { i = 1; };
-            if (NU < HIMatrix[0, 2] & NU > HIMatrix[0, 1])
+            if (NU < NUArray[2] & NU > NUArray[1])
             { i = 2; };
-            if (NU < HIMatrix[0, 3] & NU > HIMatrix[0, 2])
+            if (NU < NUArray[3] & NU > NUArray[2])
             { i = 3; };
-            if (NU < HIMatrix[0, 4] & NU > HIMatrix[0, 3])
+            if (NU < NUArray[4] & NU > NUArray[3])
             { i = 4; };
             if (NU>0)
             {
-                for (int Group = 1; Group < 26; Group++)///c 1, так как первую строку матрицы HIMatrix не учитываем(это НЮ)
+                for (int Group = 0; Group < 26; Group++)
                 {
-                    if (Group < 12)
+                    if (Group < 11)
                     {
-                        a = (HIMatrix[Group, i] - HIMatrix[Group, i - 1]) / (HIMatrix[0, i] - HIMatrix[0, i - 1]);
-                        b = HIMatrix[Group, i - 1] - a * HIMatrix[0, i - 1];
+                        a = (HIMatrix[Group, i] - HIMatrix[Group, i - 1]) / (NUArray[i] - NUArray[i - 1]);
+                        b = HIMatrix[Group, i - 1] - a * NUArray[i - 1];
                         MacroSection[(int)Zones.AZ, Group, (int)Consts.HI] = a * NU + b;
                     }
                     else

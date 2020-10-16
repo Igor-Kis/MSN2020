@@ -178,48 +178,117 @@ namespace WindowsFormsMSN2020
 
         }
 
-        public void Potok(int zone)
+        public void Potok(int zone, int iteration)
         {///вычисление потоков
             double a1=0;
             double a2=0;
             double a3=0;
-            double su;
+            double su1=0;
+            double su2=0;
+            if (zone== (int)Zones.R & iteration > 1)
+            {
+                su2 = 0;
+                for (int Group = 0; Group<26; Group++)
+                {
+                    su2+= MacroSection[zone, Group, (int)Consts.NU] * MacroSection[zone, Group, (int)Consts.S_f] * FJ[zone, Group];
+                }
+            }
+
+
             for (int Column = 0; Column < 26; Column++)
             {
 
-                su = 0;
+                su1 = 0;
                 if (Column>0)
                 {
                     for (int Row = 0; Row < Column; Row++)
                     {
-                        su += FJ[zone, Row] * MatrixSigmaScattering[(int)Zones.AZ, Row, Column]; 
+                        su1 += FJ[zone, Row] * MatrixSigmaScattering[zone, Row, Column]; 
                     }
-                    su += FJ[zone, Column - 1] * MacroSection[zone, Column - 1, (int)Consts.S_z];
+                    su1 += FJ[zone, Column - 1] * MacroSection[zone, Column - 1, (int)Consts.S_z];
                 }
                 if (zone == (int)Zones.AZ)
                 { a1 = 0; }
+                else
+                {
+                    if (iteration>0)
+                    {
+                        a1 = DJ[(int)Zones.AZ, Column] * Bg2[(int)Zones.AZ] * FJ[(int)Zones.AZ, Column];
+                    }
+                    else
+                    {
+                        a1 = 0;
+                    }
+                }
                 if (zone == (int)Zones.AZ)
                 { a2 = MacroSection[(int)Zones.AZ, Column, (int)Consts.HI]; }
-                FJ[zone, Column] = (a1 + a2 + su ) / (a3 + MacroSection[(int)Zones.AZ, Column, (int)Consts.S_u]);
+                else 
+                {
+                    if (iteration == 1)
+                    {a2 = 0;}
+                    else
+                    {
+                        if (iteration > 1)
+                        {a2 = su2 * MacroSection[zone, Column, (int)Consts.HI];}
+                        else
+                        { a2 = 0; }
+                    }
+                }
+                if (zone == (int)Zones.AZ & iteration>0)
+                { a3 = Bg2[(int)Zones.AZ] * DJ[(int)Zones.AZ, Column]; }
+                else
+                { a3 = 0; }
+
+                    FJ[zone, Column] = (a1 + a2 + su1 ) / (a3 + MacroSection[zone, Column, (int)Consts.S_u]);
             }
-            
-         ///вычисление ценностей
+
+            ///вычисление ценностей
+            if (zone == (int)Zones.R & iteration > 1)
+            {
+                su2 = 0;
+                for (int Group = 0; Group < 26; Group++)
+                {
+                    su2 += MacroSection[zone, Group, (int)Consts.HI] * FJ[zone, Group];
+                }
+            }
             for (int Row = 25; Row >= 0; Row--)
             {
-                su = 0;
-                if (Row < 25)
+                if (zone== (int)Zones.R & iteration==0)
+                { FJZ[zone, Row] = 0; }
+                else
                 {
-                    for (int Column = Row + 1; Column < 26; Column++)
+                    su1 = 0;
+                    if (Row < 25)
                     {
-                        su += FJZ[zone, Column] * MatrixSigmaScattering[(int)Zones.AZ, Row, Column];
+                        for (int Column = Row + 1; Column < 26; Column++)
+                        {
+                            su1 += FJZ[zone, Column] * MatrixSigmaScattering[zone, Row, Column];
+                        }
+                        su1 += FJZ[zone, Row + 1] * MacroSection[zone, Row + 1, (int)Consts.S_z];
                     }
-                    su += FJZ[zone, Row+1] * MacroSection[zone, Row+1, (int)Consts.S_z];
+                    if (zone == (int)Zones.AZ)
+                    { a1 = 0; }
+                    else
+                    {
+                        if (iteration>0)
+                        { a1 = DJ[(int)Zones.AZ, Row]*Bg2[(int)Zones.AZ]*FJZ[(int)Zones.AZ,Row]; }
+                        else 
+                        { a1 = 0; }
+                    }
+                    if (zone == (int)Zones.AZ)
+                    { a2 = MacroSection[(int)Zones.AZ, Row, (int)Consts.NU] * MacroSection[(int)Zones.AZ, Row, (int)Consts.S_f]; }
+                    else
+                    {
+                        if(iteration<2)
+                        { a2 = 0; }
+                        else
+                        { a2 = MacroSection[zone, Row, (int)Consts.NU] * MacroSection[zone, Row, (int)Consts.S_f] * su2; }
+                    }
+                    if(zone== (int)Zones.AZ & iteration>0)
+                    { a3 = DJ[(int)Zones.AZ, Row] * Bg2[(int)Zones.AZ]; }
+                    else { a3 = 0; }
+                    FJZ[zone, Row] = (a1 + a2 + su1) / (a3 + MacroSection[zone, Row, (int)Consts.S_u]);
                 }
-                if (zone == (int)Zones.AZ)
-                { a1 = 0; }
-                if (zone == (int)Zones.AZ)
-                { a2 = MacroSection[(int)Zones.AZ, Row, (int)Consts.NU]* MacroSection[(int)Zones.AZ, Row, (int)Consts.S_f]; }
-                FJZ[zone, Row] = (a1 + a2 + su) / (a3 + MacroSection[(int)Zones.AZ, Row, (int)Consts.S_u]);
             }
         }
         public void OneGroupConst(int zone)

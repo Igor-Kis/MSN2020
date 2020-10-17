@@ -193,11 +193,8 @@ namespace WindowsFormsMSN2020
                     su2+= MacroSection[zone, Group, (int)Consts.NU] * MacroSection[zone, Group, (int)Consts.S_f] * FJ[zone, Group];
                 }
             }
-
-
             for (int Column = 0; Column < 26; Column++)
             {
-
                 su1 = 0;
                 if (Column>0)
                 {
@@ -221,7 +218,7 @@ namespace WindowsFormsMSN2020
                     }
                 }
                 if (zone == (int)Zones.AZ)
-                { a2 = MacroSection[(int)Zones.AZ, Column, (int)Consts.HI]; }
+                { a2 = MacroSection[zone, Column, (int)Consts.HI]; }
                 else 
                 {
                     if (iteration == 1)
@@ -235,11 +232,11 @@ namespace WindowsFormsMSN2020
                     }
                 }
                 if (zone == (int)Zones.AZ & iteration>0)
-                { a3 = Bg2[(int)Zones.AZ] * DJ[(int)Zones.AZ, Column]; }
+                { a3 = Bg2[zone] * DJ[zone, Column]; }
                 else
                 { a3 = 0; }
 
-                    FJ[zone, Column] = (a1 + a2 + su1 ) / (a3 + MacroSection[zone, Column, (int)Consts.S_u]);
+                FJ[zone, Column] = (a1 + a2 + su1 ) / (a3 + MacroSection[zone, Column, (int)Consts.S_u]);
             }
 
             ///вычисление ценностей
@@ -303,7 +300,7 @@ namespace WindowsFormsMSN2020
                 {
                     for (int j = 0; j < i; j++)
                     { 
-                        C+=FJ[zone,j]* MatrixSigmaScattering[(int)Zones.AZ, j, i]; 
+                        C+=FJ[zone,j]* MatrixSigmaScattering[zone, j, i]; 
                     }
                     C += FJ[zone, i - 1] * MacroSection[zone, i - 1, (int)Consts.S_z];
                 }

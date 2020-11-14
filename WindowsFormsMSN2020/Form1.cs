@@ -109,12 +109,14 @@ namespace WindowsFormsMSN2020
                 }
                 Compute.NucDensity.Add(NucDens);
             }
+            int iteration = 0;
             Compute.Isotopes = Isotopes;
             Compute.LoadIsotopesData(ref Compute.MacroSection, Compute.NucDensity);
             Compute.HIinterpolation();
-            Compute.Potok(0);
+
+            Compute.Potok(0, iteration);
             Compute.OneGroupConst(0);
-            Compute.Radius();
+            Compute.Radius(iteration);
             for (int i = 0; i < 15; i++)
             {
                 ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.HI].ToString());

@@ -163,8 +163,9 @@ namespace WindowsFormsMSN2020
     {
         public LinearExpansion()
         {
-
+            PolinomKoeffsPWR = new double[9];
         }
+        static double[] PolinomKoeffsPWR = new double[] { 1e-6, 1e-8, 1e-11, 1e-11, 1e-12, 1e-15, 1e-18, 1e-21, 1e-25 };
 
         public void LoadFromXml(XmlNode node)
         {
@@ -181,6 +182,21 @@ namespace WindowsFormsMSN2020
         public void SaveToXml(XmlNode node)
         {
 
+        }
+        internal double GetNuclearDensity(double baseNuclearDensity, double temperature)
+        {
+            //пока только для одного интервала
+            double T = temperature - 273;
+            double alpha = 0;
+            if (this.Count > 0)
+            {
+                LineExpInterval li = this[0];
+                for (int i = 0; i < li.PolinomKoeffs.Length; i++)
+                    alpha = alpha + Math.Pow(T, i) * li.PolinomKoeffs[i] * PolinomKoeffsPWR[i];
+
+                return baseNuclearDensity / (1 + 3 * alpha * (T - 293));
+            }
+            else return baseNuclearDensity;
         }
     }
 

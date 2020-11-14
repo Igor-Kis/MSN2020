@@ -33,6 +33,7 @@ namespace WindowsFormsMSN2020
 
     public class Compute
     {
+        public double T = 293;
         public Dictionary<string, IsotopeProperties> Isotopes = new Dictionary<string, IsotopeProperties>();
         public double[,,] MacroSection = new double[2, 26, 12];
         ///public List<double[,,]> IsotopesData = new List<double[,,]>();
@@ -125,14 +126,15 @@ namespace WindowsFormsMSN2020
                 IsotopeNum = 0;
                 foreach (var isotope in Isotopes)
                 {
-
+                    if (Zone == 0)
+                    { NuclearDensity = NucDensity[IsotopeNum].AZ; }
+                    else
+                    { NuclearDensity = NucDensity[IsotopeNum].R; }
+                    NuclearDensity = isotope.Value.leProperties.GetNuclearDensity(NuclearDensity, T); ///УЧЕТ ЛИНЕЙНОГО РАСШИРЕНИЯ
                     for (int Group = 0; Group < 26; Group++)
                     {
                         su1 = 0;
-                        if (Zone==0)
-                        { NuclearDensity = NucDensity[IsotopeNum].AZ; }
-                        else
-                        { NuclearDensity = NucDensity[IsotopeNum].R; }
+                        
                         MacroSection[Zone, Group, (int)Consts.S_t] += isotope.Value.SigmaTotal[Group] * NuclearDensity * Math.Pow(10, -24);
                         MacroSection[Zone, Group, (int)Consts.S_f] += isotope.Value.SigmaFission[Group] * NuclearDensity * Math.Pow(10, -24);
                         MacroSection[Zone, Group, (int)Consts.NU] += isotope.Value.SigmaFission[Group] * isotope.Value.NuFission[Group] * NuclearDensity * Math.Pow(10, -24);
@@ -325,10 +327,14 @@ namespace WindowsFormsMSN2020
                 Bg2[zone] = (SA[zone]- NFSA[zone]) / DA[zone];
             }
         }
-        public void Radius()
+        public void Radius(int iteration)
         {
-            R0 = 3.142 / Math.Sqrt(Bg2[(int)Zones.AZ]); ///крит. радиус "голого" р-ра + экстраполированная добавка
-            R0F = R0 - 2.13 * DA[(int)Zones.AZ]; ///физический размер "голого" реактора
+            if (iteration==0)
+            {
+                R0 = 3.142 / Math.Sqrt(Bg2[(int)Zones.AZ]); ///крит. радиус "голого" р-ра + экстраполированная добавка
+                R0F = R0 - 2.13 * DA[(int)Zones.AZ]; ///физический размер "голого" реактора
+            }
+
         }
 
 

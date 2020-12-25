@@ -53,7 +53,21 @@ namespace WindowsFormsMSN2020
             leProperties = new LinearExpansion();
             rbcProperties = new ResonanceBlockKoefs();
         }
-
+    
+        //сигма0 и температура и набор коэффициентов для интерполяции и номер группы
+        public double GetF(double sigma0, double T, ResBlockKoef rbk, int GrNum)
+        {
+            double F = 0;
+            double[] FArr = new double[9];
+            for (int i = 0; i < 9; i++)
+                FArr[i] = rbk.ResBlockMatrix300[GrNum, i] + (rbk.ResBlockMatrix900[GrNum, i] - rbk.ResBlockMatrix300[GrNum, i]) * (T - 300) / 600;//600=900-300
+            for (int i = 0; i < 7; i++)
+                if (sigma0 >= AddConsts.S0Arr[i] && (sigma0 <= AddConsts.S0Arr[i + 1]))
+                {
+                    return FArr[i] + (FArr[i + 1] - FArr[i]) * (sigma0 - AddConsts.S0Arr[i]) / (AddConsts.S0Arr[i + 1] - AddConsts.S0Arr[i]);
+                }
+            return F;
+        }
 
         public void LoadFromXml(XmlNode node)
         {
@@ -90,6 +104,11 @@ namespace WindowsFormsMSN2020
 
         }
 
+    }
+
+    public static class AddConsts
+    {
+        public static double[] S0Arr = { 0, 1, 10, 100, 1000, 10000, 100000, 1000000 }; // массив значений сигма0
     }
 
     public class ResonanceBlockKoefs : IXmlSaveLoad
@@ -185,7 +204,6 @@ namespace WindowsFormsMSN2020
         }
         internal double GetNuclearDensity(double baseNuclearDensity, double temperature)
         {
-            //пока только для одного интервала
             double T = temperature - 273;
             double alpha = 0;
             if (this.Count > 0)

@@ -33,10 +33,11 @@ namespace WindowsFormsMSN2020
 
     public class Compute
     {
+        public LinearExpansion LineExp = new LinearExpansion();
         public double T = 293;
         public Dictionary<string, IsotopeProperties> Isotopes = new Dictionary<string, IsotopeProperties>();
         public double[,,] MacroSection = new double[2, 26, 12];
-        ///public List<double[,,]> IsotopesData = new List<double[,,]>();
+                ///public List<double[,,]> IsotopesData = new List<double[,,]>();
         public List<(double AZ, double R)> NucDensity = new List<(double, double)>();
        
         public double[,] DJ = new double[2, 26];
@@ -56,6 +57,8 @@ namespace WindowsFormsMSN2020
         public double[] Bg2 = new double[2];
         public double R0;
         public double R0F;
+        public double RNew;
+        public double ROld;
         public double NU;
         public double[,] HIMatrix = new double[11, 5] { 
                                                         {0.016, 0.017, 0.018, 0.020, 0.21 },
@@ -114,7 +117,7 @@ namespace WindowsFormsMSN2020
 
         }
 
-        public void LoadIsotopesData( ref double[,,] MacroSection, List<(double AZ, double R)> NucDensity)
+        public void LoadIsotopesData( ref double[,,] MacroSection, List<(double AZ, double R)> NucDensity) ///Расчет макросечений
         {            
             int pos = 0;
             int IsotopeNum = 0;
@@ -130,7 +133,6 @@ namespace WindowsFormsMSN2020
                     { NuclearDensity = NucDensity[IsotopeNum].AZ; }
                     else
                     { NuclearDensity = NucDensity[IsotopeNum].R; }
-                    NuclearDensity = isotope.Value.leProperties.GetNuclearDensity(NuclearDensity, T); ///УЧЕТ ЛИНЕЙНОГО РАСШИРЕНИЯ
                     for (int Group = 0; Group < 26; Group++)
                     {
                         su1 = 0;
@@ -177,6 +179,27 @@ namespace WindowsFormsMSN2020
                 }
 
             }
+
+        }
+
+        /*public void Blocking()
+        {
+            for 
+        }
+        */
+
+        public void CorrectNucDens(ref List<(double AZ, double R)> NucDensity)  ///Учет линейного расширения
+        {
+            int IsotopeNum = 0;
+            foreach (var isotope in Isotopes)
+            {
+                (double AZ, double R) ND = NucDensity[IsotopeNum];
+                ND.AZ = isotope.Value.leProperties.GetNuclearDensity(NucDensity[IsotopeNum].AZ, T);
+                ND.R = isotope.Value.leProperties.GetNuclearDensity(NucDensity[IsotopeNum].R, T);
+                NucDensity[IsotopeNum] = ND;
+                IsotopeNum++;
+            }
+
 
         }
 
@@ -327,6 +350,33 @@ namespace WindowsFormsMSN2020
                 Bg2[zone] = (SA[zone]- NFSA[zone]) / DA[zone];
             }
         }
+
+        public void Transcendent(int iteration)
+        {
+            double FUN(double x)
+            {
+                double B = Math.Sqrt(Bg2[(int)Zones.AZ]);
+                double K = Math.Sqrt(Bg2[(int)Zones.R]);
+                return (Math.Sin(x) / Math.Cos(x) / x - 1 / (1 - DA[(int)Zones.R] / DA[(int)Zones.AZ] * (1 + K * x / B)));
+            }
+
+            for (int zone = (int)Zones.AZ; zone < (int)Zones.R; zone++)
+            {
+            }
+            double min = 1.571;
+            double max = 4.712;
+            double mid;
+            for (int i = 0; i<100; i++)
+            {
+                mid = (min + max) / 2;
+                if (FUN(min)*FUN(max)<0)
+                { max = mid; }
+                else { min = mid; }
+            }
+            RNew = (min + max) / (2 * Math.Sqrt(Bg2[(int)Zones.AZ]));
+            
+        }
+
         public void Radius(int iteration)
         {
             if (iteration==0)

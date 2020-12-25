@@ -18,6 +18,7 @@ namespace WindowsFormsMSN2020
         public Dictionary<string, IsotopeProperties> Isotopes;
         public Compute Compute = new Compute();
         
+        
         public Form1()
         {
             
@@ -42,6 +43,13 @@ namespace WindowsFormsMSN2020
                 dataGridView1.Rows[pos].Cells[0].Value = item.Value.Name;
                 pos++;
             }
+            ///Тестовые значения ядерных плотностей
+            dataGridView1[1, 4].Value = 54.95;
+            dataGridView1[1, 14].Value = 42.31;
+            dataGridView1[2, 14].Value = 42.31;
+            dataGridView1[1, 20].Value = 64.84;
+            dataGridView1[1, 21].Value = 259.4;
+            
         }
         
         private void LoadData()
@@ -78,6 +86,8 @@ namespace WindowsFormsMSN2020
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            CultureInfo culture;
+            culture = CultureInfo.CreateSpecificCulture("eu-ES");
             (double AZ, double R) NucDens;
             for (int i = 0; i< dataGridView1.RowCount; i++)
             {
@@ -85,7 +95,7 @@ namespace WindowsFormsMSN2020
                 double value = -1;
                 if (dataGridView1[1, i].Value != null)
                 {
-                    if (double.TryParse(dataGridView1[1, i].Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (double.TryParse(dataGridView1[1, i].Value.ToString(), NumberStyles.Any, culture, out value))
                     {
                         NucDens.AZ = value * Math.Pow(10, 20);
                         ///double.Parse(dataGridView1[1, i].Value.ToString())
@@ -97,7 +107,7 @@ namespace WindowsFormsMSN2020
                 }
                 if (dataGridView1[2, i].Value != null)
                 {
-                    if (double.TryParse(dataGridView1[2, i].Value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (double.TryParse(dataGridView1[2, i].Value.ToString(), NumberStyles.Any, culture, out value))
                     {
                         NucDens.R = value * Math.Pow(10, 20);
                     }
@@ -123,12 +133,24 @@ namespace WindowsFormsMSN2020
             */
 
             Compute.Potok(0, iteration);                                            
-            Compute.OneGroupConst(0);                                               
-            Compute.Radius(iteration);                                              
-            for (int i = 0; i < 15; i++)
+            Compute.OneGroupConst(0);
+            
+            
+            for (iteration=1; iteration<20; iteration++)
+            {
+                Compute.Potok(0, iteration);
+                Compute.OneGroupConst(0);
+                Compute.Potok(1, iteration);
+                Compute.OneGroupConst(1);
+               
+            }
+            Compute.Radius(0);
+
+            for (int i = 0; i < 1; i++)
             {
                 ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.HI].ToString());
-                System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
+                ///System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
+                System.Windows.Forms.MessageBox.Show(Compute.RNew().ToString());
                 ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.S_t].ToString());
             }
         }

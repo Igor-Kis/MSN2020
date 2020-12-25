@@ -86,6 +86,8 @@ namespace WindowsFormsMSN2020
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            double ROld;
+            double EP;
             CultureInfo culture;
             culture = CultureInfo.CreateSpecificCulture("eu-ES");
             (double AZ, double R) NucDens;
@@ -124,34 +126,29 @@ namespace WindowsFormsMSN2020
             Compute.CorrectNucDens(ref Compute.NucDensity);                         ///Учет линейного расширения
             Compute.LoadIsotopesData(ref Compute.MacroSection, Compute.NucDensity); ///Расчет макросечений
             Compute.HIinterpolation();                                              ///Интерполяция значений HI
-
-            /*do
+            Compute.Potok((int)Zones.AZ, iteration);                                 ///Нулевая итерация           
+            Compute.OneGroupConst((int)Zones.AZ);
+            Compute.Radius((int)Zones.AZ);
+            ROld = Compute.R0F;
+            iteration++;
+            do                                                                      ///1+ итерации
             {
+                for(int zone=(int)Zones.AZ; zone<=(int)Zones.R;zone++)
+                {
+                    Compute.Potok(zone, iteration);
+                    Compute.OneGroupConst(zone);
+                }
+                Compute.Transcendent();
+                EP = Math.Abs(Compute.RNew - ROld) / ROld;
+                ROld = Compute.RNew;
+                iteration++;
 
             }
-            while (EP > 0.0001 || iteration < 100) ;
-            */
-
-            Compute.Potok(0, iteration);                                            
-            Compute.OneGroupConst(0);
-            
-            
-            for (iteration=1; iteration<20; iteration++)
-            {
-                Compute.Potok(0, iteration);
-                Compute.OneGroupConst(0);
-                Compute.Potok(1, iteration);
-                Compute.OneGroupConst(1);
-               
-            }
-            Compute.Radius(0);
+            while (EP > 0.0001 || iteration < 100);
 
             for (int i = 0; i < 1; i++)
             {
-                ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.HI].ToString());
-                ///System.Windows.Forms.MessageBox.Show(Compute.R0.ToString());
-                System.Windows.Forms.MessageBox.Show(Compute.RNew().ToString());
-                ///System.Windows.Forms.MessageBox.Show(Compute.MacroSection[(int)Zones.AZ, i, (int)Consts.S_t].ToString());
+                System.Windows.Forms.MessageBox.Show(ROld.ToString());
             }
         }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)

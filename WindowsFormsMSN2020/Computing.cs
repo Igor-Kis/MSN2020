@@ -57,7 +57,8 @@ namespace WindowsFormsMSN2020
         public double[] Bg2 = new double[2];
         public double R0;
         public double R0F;
-        public double ROld;
+        
+        public double RNew;
         public double NU;
         public double Pi=Math.PI;
         public double[,] HIMatrix = new double[11, 5] { 
@@ -351,9 +352,8 @@ namespace WindowsFormsMSN2020
             }
         }
 
-        public double RNew() ///Решение трансцендентного уравнения
+        public void Transcendent() ///Решение трансцендентного уравнения
         {
-            double RNew;
             double FUN(double x)
             {
                 double B = Math.Sqrt(Bg2[(int)Zones.AZ]);
@@ -375,9 +375,9 @@ namespace WindowsFormsMSN2020
                 else { min = mid; }
             }
             RNew = (min + max) / (2 * Math.Sqrt(Bg2[(int)Zones.AZ]));
-            return RNew;
-            
+            Bg2[(int)Zones.AZ] = Math.Pow(Pi / RNew, 2);
         }
+
 
         public void Radius(int iteration)
         {
@@ -385,12 +385,9 @@ namespace WindowsFormsMSN2020
             {
                 R0 = 3.142 / Math.Sqrt(Bg2[(int)Zones.AZ]); ///крит. радиус "голого" р-ра + экстраполированная добавка
                 R0F = R0 - 2.13 * DA[(int)Zones.AZ]; ///физический размер "голого" реактора
+                Bg2[(int)Zones.AZ] = Math.Pow(Pi / R0F, 2);
             }
-            else
-            {
-                R0 = 3.142 / Math.Sqrt(Bg2[(int)Zones.AZ]); ///крит. радиус "голого" р-ра + экстраполированная добавка
-                R0F = R0 - 2.13 * DA[(int)Zones.AZ]; ///физический размер "голого" реактора
-            }
+            
         }
 
 

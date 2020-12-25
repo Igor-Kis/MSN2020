@@ -150,6 +150,7 @@ namespace WindowsFormsMSN2020
             {
                 System.Windows.Forms.MessageBox.Show(ROld.ToString());
                 ///
+                /// ололо
             }
         }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)

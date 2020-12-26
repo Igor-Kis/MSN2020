@@ -100,6 +100,8 @@ namespace WindowsFormsMSN2020
         private void btnRaschet_Click(object sender, EventArgs e)
         {
 
+
+
         }
 
         private void btnAZ_Click(object sender, EventArgs e)

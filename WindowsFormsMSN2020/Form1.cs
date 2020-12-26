@@ -44,12 +44,15 @@ namespace WindowsFormsMSN2020
                 pos++;
             }
             ///Тестовые значения ядерных плотностей
-            dataGridView1[1, 4].Value = 54.95;
+            /*dataGridView1[1, 4].Value = 54.95;
             dataGridView1[1, 14].Value = 42.31;
             dataGridView1[2, 14].Value = 42.31;
             dataGridView1[1, 20].Value = 64.84;
             dataGridView1[1, 21].Value = 259.4;
             
+            */
+            dataGridView1[1, 20].Value = 473.9;
+            dataGridView1[2, 21].Value = 473.0;
         }
         
         private void LoadData()
@@ -144,7 +147,7 @@ namespace WindowsFormsMSN2020
                 iteration++;
 
             }
-            while (EP > 0.0001 || iteration < 100);
+            while (EP > 0.0001 & iteration < 100);
 
             for (int i = 0; i < 1; i++)
             {

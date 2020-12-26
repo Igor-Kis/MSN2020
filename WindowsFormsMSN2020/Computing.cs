@@ -195,8 +195,14 @@ namespace WindowsFormsMSN2020
             foreach (var isotope in Isotopes)
             {
                 (double AZ, double R) ND = NucDensity[IsotopeNum];
-                ND.AZ = isotope.Value.leProperties.GetNuclearDensity(NucDensity[IsotopeNum].AZ, T);
-                ND.R = isotope.Value.leProperties.GetNuclearDensity(NucDensity[IsotopeNum].R, T);
+                if (ND.AZ != 0)
+                {
+                    ND.AZ = isotope.Value.leProperties.GetNuclearDensity(NucDensity[IsotopeNum].AZ, T);
+                }
+                if (ND.R != 0)
+                {
+                    ND.R = isotope.Value.leProperties.GetNuclearDensity(NucDensity[IsotopeNum].R, T);
+                }
                 NucDensity[IsotopeNum] = ND;
                 IsotopeNum++;
             }
